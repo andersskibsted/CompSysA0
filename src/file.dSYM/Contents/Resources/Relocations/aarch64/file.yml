@@ -1,0 +1,15 @@
+---
+triple:          'arm64-apple-darwin'
+binary-path:     file
+relocations:
+  - { offset: 0x26, size: 0x8, addend: 0x0, symName: _print_hello_world, symObjAddr: 0x0, symBinAddr: 0x1000038F0, symSize: 0x28 }
+  - { offset: 0x4D, size: 0x8, addend: 0x0, symName: _FILE_TYPE_STRINGS, symObjAddr: 0x658, symBinAddr: 0x100004048, symSize: 0x0 }
+  - { offset: 0x78, size: 0x8, addend: 0x0, symName: _print_hello_world, symObjAddr: 0x0, symBinAddr: 0x1000038F0, symSize: 0x28 }
+  - { offset: 0x91, size: 0x8, addend: 0x0, symName: _print_error, symObjAddr: 0x28, symBinAddr: 0x100003918, symSize: 0x64 }
+  - { offset: 0xC7, size: 0x8, addend: 0x0, symName: _is_ascii_char, symObjAddr: 0x8C, symBinAddr: 0x10000397C, symSize: 0x8C }
+  - { offset: 0xEF, size: 0x8, addend: 0x0, symName: _is_iso_char, symObjAddr: 0x118, symBinAddr: 0x100003A08, symSize: 0x74 }
+  - { offset: 0x117, size: 0x8, addend: 0x0, symName: _is_utf_char, symObjAddr: 0x18C, symBinAddr: 0x100003A7C, symSize: 0x84 }
+  - { offset: 0x13F, size: 0x8, addend: 0x0, symName: _is_data_char, symObjAddr: 0x210, symBinAddr: 0x100003B00, symSize: 0x38 }
+  - { offset: 0x167, size: 0x8, addend: 0x0, symName: _is_empty_char, symObjAddr: 0x248, symBinAddr: 0x100003B38, symSize: 0x38 }
+  - { offset: 0x18F, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x280, symBinAddr: 0x100003B70, symSize: 0x334 }
+...

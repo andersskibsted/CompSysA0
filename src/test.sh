@@ -14,10 +14,11 @@ rm -f test_files/*
 echo "Generating test files.."
 printf "Hello, World!\n" > test_files/ascii.input
 printf "Hello, World!" > test_files/ascii2.input
-printf "Hello,\x00World!\n" > test_files/data.input
+printf "Hello,\x00\x00\x00\x00 World!\n" > test_files/data.input
 printf "" > test_files/empty.input
 printf "Hej med æøå og emojis" > test_files/utf8.input
-printf "æøå" | iconv -f UTF-8 -t ISO-8859-1 > test_files/iso.input
+printf "æøå45eeaoy" | iconv -f UTF-8 -t ISO-8859-1 > test_files/iso.input
+head -c 100 /dev/urandom > test_files/random_bytes.input
 
 
 ### TODO: Generate more test files ###

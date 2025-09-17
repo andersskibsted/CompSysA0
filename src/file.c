@@ -14,6 +14,8 @@ int print_error(char *path, int errnum) {
                  strerror(errnum));
 }
 
+//int combine_bytes_to_int()
+
 int is_ascii_char(unsigned char c) {
   if ((c >= 7 && c <= 13) || c == 27 || (c >= 32 && c <= 127)) {
     return 1;
@@ -37,6 +39,42 @@ int is_utf_char(unsigned char c) {
   } else if (c <= 247 && c > 0) {
     return 1;
   } else {
+    return 0;
+  }
+}
+
+int is_second_utf_byte(unsigned char c) {
+  return (c >= 128 && c <= 191);
+}
+
+int is_in_range_inclusive(unsigned char c, unsigned int lower, unsigned int upper) {
+  return ((lower <= c) && (c >= upper));
+}
+
+int is_utf_char2(unsigned char* c) {
+  /* for (int i = 0; i < 4; i++) { */
+  /*   if (c[i] == 0) return 0; */
+  /* } */
+
+  if (c[0] <= 127) {
+
+    return (!is_second_utf_byte(c[1]) && c[1] > 0);
+
+  } else if ((192 <= c[0]) && (c[0] <= 223)) {
+    // second byte check
+    return is_second_utf_byte(c[1]);
+
+  } else if ((223 < c[0]) && (c[0] <= 239)) {
+
+    return (is_second_utf_byte(c[1]) && is_second_utf_byte(c[2]));
+
+  } // Ditto
+  else if ((239 < c[0]) && (c[0] <= 247)) {
+
+    return (is_second_utf_byte(c[1]) && is_second_utf_byte(c[2]) && is_second_utf_byte(c[3]));
+
+  } else {
+
     return 0;
   }
 }
@@ -83,11 +121,17 @@ int main(int argc, char* argv[]) {
       return EXIT_SUCCESS;
     }
 
-    unsigned char c = '\0';
+    //unsigned char c = '\0';
+    unsigned char c = 0;
+    //unsigned char* cp = (unsigned char*) &c;
+    unsigned char byteArray[4] = { 0, 0, 0, 0 };
+    int number_of_reads = 0;
     int is_ascii = 1;
     int is_iso = 1;
     int is_utf = 1;
+    //int n = fread(&c, sizeof(int), 1, f);
     int n = fread(&c, sizeof(char), 1, f);
+
 
     if (n == 0) {
       printf("%s: %s\n", argv[1], FILE_TYPE_STRINGS[EMPTY]);
@@ -95,9 +139,20 @@ int main(int argc, char* argv[]) {
     }
 
     while (n == 1) {
+      number_of_reads++;
+
+      // Move all elements in byte array
+      for (int i = 1; i < 4; i++) {
+        byteArray[i - 1] = byteArray[i];
+      }
+      // Put newest byte in last place in array;
+      byteArray[3] = c;
+      // Check for ASCII and ISO bytes
       is_ascii = is_ascii && is_ascii_char(c);
       is_iso = is_iso && is_iso_char(c);
-      is_utf = is_utf && is_utf_char(c);
+
+      if ((number_of_reads % 4) == 0) is_utf = is_utf && is_utf_char2(byteArray);
+
       n = fread(&c, sizeof(char), 1, f);
     }
 

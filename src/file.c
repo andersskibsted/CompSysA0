@@ -1,185 +1,134 @@
+#include <errno.h>  // errno.
 #include <stdio.h>  // fprintf, stdout, stderr.
 #include <stdlib.h> // exit, EXIT_FAILURE, EXIT_SUCCESS.
 #include <string.h> // strerror.
-#include <errno.h>  // errno.
-
-int print_hello_world(void) {
-  return fprintf(stdout, "Hello, world!\n");
-}
 
 int print_error(char *path, int errnum) {
-  return fprintf(stdout,
-                 "%s: cannot determine (%s)\n",
-                 path,
-                 strerror(errnum));
+  return fprintf(stdout, "%s: cannot determine (%s)\n", path, strerror(errnum));
 }
 
-//int combine_bytes_to_int()
+int file_len(FILE *file) {
+  fseek(file, 0, SEEK_END);
+  int size = ftell(file);
+  rewind(file);
+  return size;
+}
 
 int is_ascii_char(unsigned char c) {
-  if ((c >= 7 && c <= 13) || c == 27 || (c >= 32 && c <= 127)) {
-    return 1;
-  } else {
-    return 0;
-  }
+  return ((c >= 7 && c <= 13) || c == 27 || (c >= 32 && c <= 126));
 }
 
 int is_iso_char(unsigned char c) {
-  if (is_ascii_char(c) || (c > 159 && c > 0)) {
-    return 1;
-  } else {
-    return 0;
-  }
+  return (is_ascii_char(c) || (c >= 160 && c <= 255));
 }
 
-int is_utf_char(unsigned char c) {
-  // Missing implementation
-  if (c >= 128 && c <= 191) {
-    return 1;
-  } else if (c <= 247 && c > 0) {
-    return 1;
-  } else {
-    return 0;
-  }
+int is_utf_one_byte(unsigned char c) { return (c <= 127 && is_ascii_char(c)); }
+
+int is_utf_two_byte(unsigned char c) {
+  return (c >= 193 && c <= 223); // Excludes 192 as it carries no information
+                                 // and should be a one byte
 }
 
-int is_second_utf_byte(unsigned char c) {
-  return (c >= 128 && c <= 191);
+int is_utf_three_byte(unsigned char c) {
+  return (c >= 225 && c <= 239); // Excludes 224; carries no information and
+                                 // should be a two/one byte
 }
 
-int is_in_range_inclusive(unsigned char c, unsigned int lower, unsigned int upper) {
-  return ((lower <= c) && (c >= upper));
+int is_utf_four_byte(unsigned char c) {
+  return (c >= 241 && c <= 255); // Excludes 240; carries no information and
+                                 // should be a three/two/one byte
 }
 
-int is_utf_char2(unsigned char* c) {
-  /* for (int i = 0; i < 4; i++) { */
-  /*   if (c[i] == 0) return 0; */
-  /* } */
+int is_utf_continuation(unsigned char c) { return (c >= 128 && c <= 191); }
 
-  if (c[0] <= 127) {
+enum file_type { DATA, EMPTY, ASCII, ISO, UTF };
 
-    return (!is_second_utf_byte(c[1]) && c[1] > 0);
+const char *const FILE_TYPE_STRINGS[] = {
+    "data", "empty", "ASCII text", "ISO-8859 text",
+    "Unicode text, UTF-8 text, with no line terminators"};
 
-  } else if ((192 <= c[0]) && (c[0] <= 223)) {
-    // second byte check
-    return is_second_utf_byte(c[1]);
-
-  } else if ((223 < c[0]) && (c[0] <= 239)) {
-
-    return (is_second_utf_byte(c[1]) && is_second_utf_byte(c[2]));
-
-  } // Ditto
-  else if ((239 < c[0]) && (c[0] <= 247)) {
-
-    return (is_second_utf_byte(c[1]) && is_second_utf_byte(c[2]) && is_second_utf_byte(c[3]));
-
-  } else {
-
-    return 0;
-  }
-}
-
-int is_data_char(char c) {
-  // Missing implementation
-  if (c) {
-    return 0;
-  }
-  return 0;
-}
-
-int is_empty_char(char c) {
-  // Missing implementation
-  if (c) {
-    return 0;
-  }
-  return 0;
-}
-
-enum file_type {
-  DATA,
-  EMPTY,
-  ASCII,
-  ISO,
-  UTF
-};
-
-const char * const FILE_TYPE_STRINGS[] = {
-  "data",
-  "empty",
-  "ASCII text",
-  "ISO-8859 text",
-  "Unicode text, UTF-8 text, with no line terminators"
-};
-
-int main(int argc, char* argv[]) {
-  // Sanitizing input
-  if (argc == 2) {
-
-    FILE *f = fopen(argv[1], "r");
-    if (errno) {
-      print_error(argv[1], errno);
-      return EXIT_SUCCESS;
-    }
-
-    //unsigned char c = '\0';
-    unsigned char c = 0;
-    //unsigned char* cp = (unsigned char*) &c;
-    unsigned char byteArray[4] = { 0, 0, 0, 0 };
-    int number_of_reads = 0;
-    int is_ascii = 1;
-    int is_iso = 1;
-    int is_utf = 1;
-    //int n = fread(&c, sizeof(int), 1, f);
-    int n = fread(&c, sizeof(char), 1, f);
-
-
-    if (n == 0) {
-      printf("%s: %s\n", argv[1], FILE_TYPE_STRINGS[EMPTY]);
-      return EXIT_SUCCESS;
-    }
-
-    while (n == 1) {
-      number_of_reads++;
-
-      // Move all elements in byte array
-      for (int i = 1; i < 4; i++) {
-        byteArray[i - 1] = byteArray[i];
-      }
-      // Put newest byte in last place in array;
-      byteArray[3] = c;
-      // Check for ASCII and ISO bytes
-      is_ascii = is_ascii && is_ascii_char(c);
-      is_iso = is_iso && is_iso_char(c);
-
-      if ((number_of_reads % 4) == 0) is_utf = is_utf && is_utf_char2(byteArray);
-
-      n = fread(&c, sizeof(char), 1, f);
-    }
-
-
-    fclose(f);
-    if (is_ascii) {
-      printf("%s: %s\n", argv[1], FILE_TYPE_STRINGS[ASCII]);
-    } else if (is_utf) {
-      printf("%s: %s\n", argv[1], FILE_TYPE_STRINGS[UTF]);
-    } else if (is_iso) {
-      printf("%s: %s\n", argv[1], FILE_TYPE_STRINGS[ISO]);
-    } else {
-      printf("%s: %s\n", argv[1], FILE_TYPE_STRINGS[DATA]);
-    }
-
-  } else {
+int main(int argc, char *argv[]) {
+  if (argc != 2) {
     fprintf(stderr, "Usage: file path\n");
     return EXIT_FAILURE;
   }
 
+  char *path = argv[1];
+  FILE *file = fopen(path, "rb");
 
-  //if (argc == 2) {
-    //fprintf(stdout, "Succes %s\n", argv[1]);
-   // retval = EXIT_SUCCESS;
-  //}
-  //if (print_hello_world() <= 0) {
-  //  retval = EXIT_FAILURE;
-  //}
+  if (file == NULL) {
+    print_error(path, errno);
+    return EXIT_SUCCESS;
+  }
 
+  int size = file_len(file);
+
+  if (size == 0) {
+    fprintf(stdout, "%s: empty\n", path);
+    return EXIT_SUCCESS;
+  }
+
+  unsigned char buffer[size];
+  int is_ascii = 1;
+  int is_iso = 1;
+  int is_utf = 1;
+
+  fread(buffer, 1, size, file);
+  fclose(file);
+  for (int i = 0; i < size; i++) {
+    is_ascii = is_ascii && is_ascii_char(buffer[i]);
+    is_iso = is_iso && is_iso_char(buffer[i]);
+    if (!is_ascii && !is_iso) {
+      break;
+    }
+  }
+
+  if (is_ascii) {
+    fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[ASCII]);
+    return EXIT_SUCCESS;
+  }
+
+  if (is_iso) {
+    fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[ISO]);
+    return EXIT_SUCCESS;
+  }
+
+  int i = 0;
+  while (i < size) {
+    if (is_utf_one_byte(buffer[i])) {
+      i++;
+      continue;
+    }
+
+    if ((i + 1 < size) && is_utf_two_byte(buffer[i]) &&
+        is_utf_continuation(buffer[i + 1])) {
+      i += 2;
+      continue;
+    }
+
+    if ((i + 2 < size) && is_utf_three_byte(buffer[i]) &&
+        is_utf_continuation(buffer[i + 1]) &&
+        is_utf_continuation(buffer[i + 2])) {
+      i += 3;
+      continue;
+    }
+
+    if ((i + 3 < size) && is_utf_four_byte(buffer[i]) &&
+        is_utf_continuation(buffer[i + 1]) &&
+        is_utf_continuation(buffer[i + 2]) &&
+        is_utf_continuation(buffer[i + 3])) {
+      i += 4;
+      continue;
+    }
+    is_utf = 0;
+    break;
+  }
+
+  if (is_utf) {
+    fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[UTF]);
+    return EXIT_SUCCESS;
+  }
+
+  fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[DATA]);
+  return EXIT_SUCCESS;
 }

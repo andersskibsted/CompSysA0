@@ -2,17 +2,16 @@
 triple:          'arm64-apple-darwin'
 binary-path:     file
 relocations:
-  - { offset: 0x26, size: 0x8, addend: 0x0, symName: _print_hello_world, symObjAddr: 0x0, symBinAddr: 0x1000035AC, symSize: 0x28 }
-  - { offset: 0x4D, size: 0x8, addend: 0x0, symName: _FILE_TYPE_STRINGS, symObjAddr: 0x990, symBinAddr: 0x100004048, symSize: 0x0 }
-  - { offset: 0x78, size: 0x8, addend: 0x0, symName: _print_hello_world, symObjAddr: 0x0, symBinAddr: 0x1000035AC, symSize: 0x28 }
-  - { offset: 0x91, size: 0x8, addend: 0x0, symName: _print_error, symObjAddr: 0x28, symBinAddr: 0x1000035D4, symSize: 0x64 }
-  - { offset: 0xC7, size: 0x8, addend: 0x0, symName: _is_ascii_char, symObjAddr: 0x8C, symBinAddr: 0x100003638, symSize: 0x8C }
-  - { offset: 0xEF, size: 0x8, addend: 0x0, symName: _is_iso_char, symObjAddr: 0x118, symBinAddr: 0x1000036C4, symSize: 0x74 }
-  - { offset: 0x117, size: 0x8, addend: 0x0, symName: _is_utf_char, symObjAddr: 0x18C, symBinAddr: 0x100003738, symSize: 0x84 }
-  - { offset: 0x13F, size: 0x8, addend: 0x0, symName: _is_second_utf_byte, symObjAddr: 0x210, symBinAddr: 0x1000037BC, symSize: 0x48 }
-  - { offset: 0x167, size: 0x8, addend: 0x0, symName: _is_in_range_inclusive, symObjAddr: 0x258, symBinAddr: 0x100003804, symSize: 0x58 }
-  - { offset: 0x1AB, size: 0x8, addend: 0x0, symName: _is_utf_char2, symObjAddr: 0x2B0, symBinAddr: 0x10000385C, symSize: 0x200 }
-  - { offset: 0x1D3, size: 0x8, addend: 0x0, symName: _is_data_char, symObjAddr: 0x4B0, symBinAddr: 0x100003A5C, symSize: 0x38 }
-  - { offset: 0x1FB, size: 0x8, addend: 0x0, symName: _is_empty_char, symObjAddr: 0x4E8, symBinAddr: 0x100003A94, symSize: 0x38 }
-  - { offset: 0x223, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x520, symBinAddr: 0x100003ACC, symSize: 0x3D0 }
+  - { offset: 0x26, size: 0x8, addend: 0x0, symName: _print_error, symObjAddr: 0x0, symBinAddr: 0x100003518, symSize: 0x64 }
+  - { offset: 0x4D, size: 0x8, addend: 0x0, symName: _FILE_TYPE_STRINGS, symObjAddr: 0xA08, symBinAddr: 0x100004070, symSize: 0x0 }
+  - { offset: 0x79, size: 0x8, addend: 0x0, symName: _print_error, symObjAddr: 0x0, symBinAddr: 0x100003518, symSize: 0x64 }
+  - { offset: 0xAF, size: 0x8, addend: 0x0, symName: _file_len, symObjAddr: 0x64, symBinAddr: 0x10000357C, symSize: 0x48 }
+  - { offset: 0xE5, size: 0x8, addend: 0x0, symName: _is_ascii_char, symObjAddr: 0xAC, symBinAddr: 0x1000035C4, symSize: 0xA0 }
+  - { offset: 0x10D, size: 0x8, addend: 0x0, symName: _is_iso_char, symObjAddr: 0x14C, symBinAddr: 0x100003664, symSize: 0x80 }
+  - { offset: 0x135, size: 0x8, addend: 0x0, symName: _is_utf_one_byte, symObjAddr: 0x1CC, symBinAddr: 0x1000036E4, symSize: 0x58 }
+  - { offset: 0x15D, size: 0x8, addend: 0x0, symName: _is_utf_two_byte, symObjAddr: 0x224, symBinAddr: 0x10000373C, symSize: 0x48 }
+  - { offset: 0x185, size: 0x8, addend: 0x0, symName: _is_utf_three_byte, symObjAddr: 0x26C, symBinAddr: 0x100003784, symSize: 0x48 }
+  - { offset: 0x1AD, size: 0x8, addend: 0x0, symName: _is_utf_four_byte, symObjAddr: 0x2B4, symBinAddr: 0x1000037CC, symSize: 0x48 }
+  - { offset: 0x1D5, size: 0x8, addend: 0x0, symName: _is_utf_continuation, symObjAddr: 0x2FC, symBinAddr: 0x100003814, symSize: 0x48 }
+  - { offset: 0x1FD, size: 0x8, addend: 0x0, symName: _main, symObjAddr: 0x344, symBinAddr: 0x10000385C, symSize: 0x628 }
 ...

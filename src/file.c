@@ -49,7 +49,7 @@ const char *const FILE_TYPE_STRINGS[] = {
 
 int main(int argc, char *argv[]) {
   if (argc != 2) {
-    fprintf(stderr, "Usage: file path\n");
+    fprintf(stdout, "Usage: file path\n");
     return EXIT_FAILURE;
   }
 

@@ -50,6 +50,8 @@ printf "😠😠😠😠😠😠😠 <->_=^" > test_files/utf82.input
 printf "한자" > test_files/utf8korean.input
 printf "漢字" > test_files/utf8japanese.input
 printf "𡨸漢" > test_files/utf8vietnamese.input
+printf "𡨸𡨸" > test_files/utf8vietnameserepeat1.input
+printf "漢漢" > test_files/utf8vietnameserepeat2.input
 printf "漢字" > test_files/utf8tradchinese.input
 printf "汉字" > test_files/utf8simplchinese.input
 printf "ἀπόστροφος" > test_files/utf8greek.input
@@ -123,8 +125,8 @@ do
 done
 
 echo "Testing non-existent file"
-file non-existent.input > non-existent.expected
-./file non-existent.input > non-existent.actual
+file non-existent.input > ./test_files/non-existent.expected
+./file non-existent.input > ./test_files/non-existent.actual
 
 if ! diff -u non-existent.expected non-existent.actual
 then

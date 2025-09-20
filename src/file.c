@@ -22,24 +22,62 @@ int is_iso_char(unsigned char c) {
   return (is_ascii_char(c) || (c >= 160 && c <= 255));
 }
 
-int is_utf_one_byte(unsigned char c) { return (c <= 127 && is_ascii_char(c)); }
+int is_utf_one_byte(unsigned char c) {
+  return (c > 0 && c <= 127);
+}
 
 int is_utf_two_byte(unsigned char c) {
-  return (c >= 193 && c <= 223); // Excludes 192 as it carries no information
+  return (c >= 192 && c <= 223); // Excludes 192 as it carries no information
                                  // and should be a one byte
 }
 
 int is_utf_three_byte(unsigned char c) {
-  return (c >= 225 && c <= 239); // Excludes 224; carries no information and
+  return (c >= 224 && c <= 239); // Excludes 224; carries no information and
                                  // should be a two/one byte
 }
 
 int is_utf_four_byte(unsigned char c) {
-  return (c >= 241 && c <= 255); // Excludes 240; carries no information and
-                                 // should be a three/two/one byte
+  //return (c >= 241 && c <= 255); // Excludes 240; carries no information and
+  return (c >= 240 && c <= 247);                               // should be a three/two/one byte
 }
 
 int is_utf_continuation(unsigned char c) { return (c >= 128 && c <= 191); }
+
+void is_utf_char(unsigned char* buffer, int size, int* is_utf) {
+    int i = 0;
+
+  while (i < size) {
+    if (is_utf_one_byte(buffer[i])) {
+      i++;
+      continue;
+    }
+
+    if ((i + 1 < size) && is_utf_two_byte(buffer[i]) &&
+        is_utf_continuation(buffer[i + 1])) {
+      i += 2;
+      continue;
+    }
+
+    if ((i + 2 < size) && is_utf_three_byte(buffer[i]) &&
+        is_utf_continuation(buffer[i + 1]) &&
+        is_utf_continuation(buffer[i + 2])) {
+      i += 3;
+      continue;
+    }
+
+    if ((i + 3 < size) && is_utf_four_byte(buffer[i]) &&
+        is_utf_continuation(buffer[i + 1]) &&
+        is_utf_continuation(buffer[i + 2]) &&
+        is_utf_continuation(buffer[i + 3])) {
+      i += 4;
+      continue;
+    }
+    *is_utf = 0;
+    break;
+  }
+}
+
+//int is_utf_continuation(unsigned char c) { return (c >= 128 && c <= 191); }
 
 enum file_type { DATA, EMPTY, ASCII, ISO, UTF };
 
@@ -82,9 +120,15 @@ int main(int argc, char *argv[]) {
       break;
     }
   }
+  is_utf_char(buffer, size, &is_utf);
 
   if (is_ascii) {
     fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[ASCII]);
+    return EXIT_SUCCESS;
+  }
+
+  if (is_utf) {
+    fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[UTF]);
     return EXIT_SUCCESS;
   }
 
@@ -93,41 +137,46 @@ int main(int argc, char *argv[]) {
     return EXIT_SUCCESS;
   }
 
-  int i = 0;
-  while (i < size) {
-    if (is_utf_one_byte(buffer[i])) {
-      i++;
-      continue;
-    }
+  /* if (is_utf_char(buffer, size)) { */
+  /*   is_utf = 1; */
+  /*   fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[UTF]); */
+  /*   return EXIT_SUCCESS; */
+  /* } */
+  /* int i = 0; */
+  /* while (i < size) { */
+  /*   if (is_utf_one_byte(buffer[i])) { */
+  /*     i++; */
+  /*     continue; */
+  /*   } */
 
-    if ((i + 1 < size) && is_utf_two_byte(buffer[i]) &&
-        is_utf_continuation(buffer[i + 1])) {
-      i += 2;
-      continue;
-    }
+  /*   if ((i + 1 < size) && is_utf_two_byte(buffer[i]) && */
+  /*       is_utf_continuation(buffer[i + 1])) { */
+  /*     i += 2; */
+  /*     continue; */
+  /*   } */
 
-    if ((i + 2 < size) && is_utf_three_byte(buffer[i]) &&
-        is_utf_continuation(buffer[i + 1]) &&
-        is_utf_continuation(buffer[i + 2])) {
-      i += 3;
-      continue;
-    }
+  /*   if ((i + 2 < size) && is_utf_three_byte(buffer[i]) && */
+  /*       is_utf_continuation(buffer[i + 1]) && */
+  /*       is_utf_continuation(buffer[i + 2])) { */
+  /*     i += 3; */
+  /*     continue; */
+  /*   } */
 
-    if ((i + 3 < size) && is_utf_four_byte(buffer[i]) &&
-        is_utf_continuation(buffer[i + 1]) &&
-        is_utf_continuation(buffer[i + 2]) &&
-        is_utf_continuation(buffer[i + 3])) {
-      i += 4;
-      continue;
-    }
-    is_utf = 0;
-    break;
-  }
+  /*   if ((i + 3 < size) && is_utf_four_byte(buffer[i]) && */
+  /*       is_utf_continuation(buffer[i + 1]) && */
+  /*       is_utf_continuation(buffer[i + 2]) && */
+  /*       is_utf_continuation(buffer[i + 3])) { */
+  /*     i += 4; */
+  /*     continue; */
+  /*   } */
+  /*   is_utf = 0; */
+  /*   break; */
+  /* } */
 
-  if (is_utf) {
-    fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[UTF]);
-    return EXIT_SUCCESS;
-  }
+  /* if (is_utf) { */
+  /*   fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[UTF]); */
+  /*   return EXIT_SUCCESS; */
+  /* } */
 
   fprintf(stdout, "%s: %s\n", path, FILE_TYPE_STRINGS[DATA]);
   return EXIT_SUCCESS;
